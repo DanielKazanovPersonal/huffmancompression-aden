@@ -134,23 +134,14 @@ public class GenWeights {
 		int fileStatus = fio.getFileStatus(file, true);
 		
 		if (fileStatus == fio.EMPTY_NAME) {
-    		Alert alert = new Alert(AlertType.WARNING);
-    		alert.setHeaderText("EMPTY_NAME");
-    		alert.setContentText("This file has an empty name.");
-    		alert.showAndWait();
+    		hca.issueAlert(HuffAlerts.INPUT, "WARNING: ", "This file has an empty name.");
 			return false;
 		}
 		if (fileStatus == fio.FILE_DOES_NOT_EXIST || fileStatus == fio.READ_ZERO_LENGTH) {
-    		Alert alert = new Alert(AlertType.WARNING);
-    		alert.setHeaderText("FILE_DOES_NOT_EXIST or READ_ZERO_LENGTH");
-    		alert.setContentText("This file does not exist or is empty.");
-    		alert.showAndWait();
+    		hca.issueAlert(HuffAlerts.INPUT, "WARNING: ", "This file does not exist or is empty.");
 			return false;
 		} else if (fileStatus == fio.NO_READ_ACCESS) {
-    		Alert alert = new Alert(AlertType.WARNING);
-    		alert.setHeaderText("NO_READ_ACCESS");
-    		alert.setContentText("This file is not readable.");
-    		alert.showAndWait();
+    		hca.issueAlert(HuffAlerts.INPUT, "WARNING: ", "This file is not readable.");
     		return false;
 		}
 		return true;
@@ -206,6 +197,8 @@ public class GenWeights {
 	 * @param outfName the name of the weights file (includes weights/ )
 	 */
 	 void saveWeightsToFile(String outfName) {
+		 
+		 
 		 
 		return;
 	}
