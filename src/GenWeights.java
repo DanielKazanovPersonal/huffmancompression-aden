@@ -131,20 +131,22 @@ public class GenWeights {
 	 * @return true file okay, false the file not okay
 	 */
 	boolean errorCheckFile(File file) {
-		if (fio.getFileStatus(file, true) == fio.EMPTY_NAME) {
+		int fileStatus = fio.getFileStatus(file, true);
+		
+		if (fileStatus == fio.EMPTY_NAME) {
     		Alert alert = new Alert(AlertType.WARNING);
     		alert.setHeaderText("EMPTY_NAME");
     		alert.setContentText("This file has an empty name.");
     		alert.showAndWait();
 			return false;
 		}
-		if (fio.getFileStatus(file, true) == fio.FILE_DOES_NOT_EXIST || fio.getFileStatus(file, true) == fio.READ_ZERO_LENGTH) {
+		if (fileStatus == fio.FILE_DOES_NOT_EXIST || fileStatus == fio.READ_ZERO_LENGTH) {
     		Alert alert = new Alert(AlertType.WARNING);
     		alert.setHeaderText("FILE_DOES_NOT_EXIST or READ_ZERO_LENGTH");
     		alert.setContentText("This file does not exist or is empty.");
     		alert.showAndWait();
 			return false;
-		} else if (fio.getFileStatus(file, true) == fio.NO_READ_ACCESS) {
+		} else if (fileStatus == fio.NO_READ_ACCESS) {
     		Alert alert = new Alert(AlertType.WARNING);
     		alert.setHeaderText("NO_READ_ACCESS");
     		alert.setContentText("This file is not readable.");
@@ -204,7 +206,7 @@ public class GenWeights {
 	 * @param outfName the name of the weights file (includes weights/ )
 	 */
 	 void saveWeightsToFile(String outfName) {
-		// TODO #3: write this method (and any helper methods)
+		 
 		return;
 	}
 
