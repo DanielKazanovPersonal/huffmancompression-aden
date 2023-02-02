@@ -88,18 +88,21 @@ public class GenWeights {
 	 * @param infName - the name of the text file to read
 	 */
 	void generateWeights(String infName) {
-		fio.createEmptyFile(infName);
-		File file = fio.getFileHandle(infName);
+		inf = fio.getFileHandle(infName);
 		
-		if (!errorCheckFile(file)) {
+		if (!errorCheckGenerateFile(inf)) {
 			return;
 		}
 		initWeights();
-		readInputFile(file);
+		readInputFile(inf);
 		
 		return;
 	}
 	
+	/**
+	 * 
+	 * @param file the file to read
+	 */
 	void readInputFile(File file) {
 		BufferedReader bufferedReader = fio.openBufferedReader(file);
 		
@@ -130,7 +133,7 @@ public class GenWeights {
 	 * @param file the file to check
 	 * @return true file okay, false the file not okay
 	 */
-	boolean errorCheckFile(File file) {
+	boolean errorCheckGenerateFile(File file) {
 		int fileStatus = fio.getFileStatus(file, true);
 		
 		if (fileStatus == fio.EMPTY_NAME) {
@@ -197,11 +200,58 @@ public class GenWeights {
 	 * @param outfName the name of the weights file (includes weights/ )
 	 */
 	 void saveWeightsToFile(String outfName) {
+		 outf = fio.getFileHandle(outfName);
 		 
+		 if (!errorCheckSaveFile(outf)) {
+			 return;
+		 }
+		 writeOutputFile(outf);
 		 
-		 
-		return;
+		 return;
 	}
+	 
+	 /**
+	  * 
+	  * @param file the file to write
+	  */
+	 void writeOutputFile(File file) {
+		 BufferedWriter bufferedWriter = fio.openBufferedWriter(file);
+		 
+		 for (int i = 0; i < weights.length; i++) {
+			 String str = i + "," + weights[i] + ",\n";
+			 try {
+				bufferedWriter.write(str);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
+		 
+		 fio.closeFile(bufferedWriter);
+	 }
+	 
+	 /**
+	  * 
+	  * @param file the file to check
+	  * @return true file okay, false the file not okay
+	  */
+	 boolean errorCheckSaveFile(File file) {
+		int fileStatus = fio.getFileStatus(file, false);
+		
+		if (fileStatus == fio.EMPTY_NAME) {
+    		hca.issueAlert(HuffAlerts.OUTPUT, "WARNING: ", "This file has an empty name.");
+			return false;
+		}
+		if (fileStatus == fio.WRITE_EXISTS && fileStatus == fio.NO_WRITE_ACCESS) {
+    		hca.issueAlert(HuffAlerts.OUTPUT, "WARNING: ", "This file exists but is not writeable.");
+			return false;
+		} else if (fileStatus == fio.WRITE_EXISTS && fileStatus == fio.WRITE_EXISTS) {
+			if (hca.issueAlert(HuffAlerts.CONFIRM, "CONFIRM: ", "This file exists and is writeable.")) {
+				return false;
+			}
+		}
+		return true;
+	 }
 
 	
 	/**
