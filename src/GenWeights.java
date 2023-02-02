@@ -3,6 +3,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import myfileio.MyFileIO;
 
 // TODO: Auto-generated Javadoc
@@ -50,7 +52,9 @@ public class GenWeights {
 	 * Initializes all elements of the weights array to 0
 	 */
 	void initWeights() {
-		// TODO #1
+		for (int i = 0; i < weights.length; i++) {
+			weights[i] = 0;
+		}
 	}
 
 	/**
@@ -84,10 +88,70 @@ public class GenWeights {
 	 * @param infName - the name of the text file to read
 	 */
 	void generateWeights(String infName) {
-		// TODO #2: write this method and any helper methods
-		System.out.println("generateWeights has not been implemented yet!");
+		fio.createEmptyFile(infName);
+		File file = fio.getFileHandle(infName);
+		
+		if (!errorCheckFile(file)) {
+			return;
+		}
+		initWeights();
+		readInputFile(file);
+		
 		return;
-
+	}
+	
+	void readInputFile(File file) {
+		BufferedReader bufferedReader = fio.openBufferedReader(file);
+		
+		int EOF = 127;
+		int counter = 0;
+		
+		try {
+			while ((counter = (bufferedReader.read() & 0b1111111)) != EOF) {
+				weights[counter]++;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		weights[0]++;
+		fio.closeFile(bufferedReader);
+	}
+	
+	/**
+	 * Checks the file for the following requirements:
+	 * a) if the filename is empty, raise a WARNING alert with an appropriate message and
+	 *    return.
+	 * b) if the file does not exist or is empty, raise a WARNING alert with an appropriate 
+	 *    message and return.
+	 * c) if the file exists and is not empty, but is not readable, raise a WARNING alert with 
+	 *    an appropriate message and return.
+	 * 
+	 * @param file the file to check
+	 * @return true file okay, false the file not okay
+	 */
+	boolean errorCheckFile(File file) {
+		if (fio.getFileStatus(file, true) == fio.EMPTY_NAME) {
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.setHeaderText("EMPTY_NAME");
+    		alert.setContentText("This file has an empty name.");
+    		alert.showAndWait();
+			return false;
+		}
+		if (fio.getFileStatus(file, true) == fio.FILE_DOES_NOT_EXIST || fio.getFileStatus(file, true) == fio.READ_ZERO_LENGTH) {
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.setHeaderText("FILE_DOES_NOT_EXIST or READ_ZERO_LENGTH");
+    		alert.setContentText("This file does not exist or is empty.");
+    		alert.showAndWait();
+			return false;
+		} else if (fio.getFileStatus(file, true) == fio.NO_READ_ACCESS) {
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.setHeaderText("NO_READ_ACCESS");
+    		alert.setContentText("This file is not readable.");
+    		alert.showAndWait();
+    		return false;
+		}
+		return true;
 	}
 	
 	/**
