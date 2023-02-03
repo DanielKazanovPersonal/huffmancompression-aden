@@ -1,6 +1,8 @@
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
+
 import org.aden.hf_lib.HuffCompTestLib;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -170,7 +172,7 @@ class HF_TreeTest {
 	}
 
 	/**
-	 * Overall encodeMap methodology:
+	 * Overall encodeMap test methodology:
 	 * 1) set optimize to true (minimal tree including only characters actually present in the
 	 *    input file) or false (tree generated with ALL characters).
 	 * 2) initialize huffUtil, hca and gw instances and set the test name
@@ -343,4 +345,34 @@ class HF_TreeTest {
 		assertTrue(hflib.checkEncodeMap(fname, noCR, optimize, huffUtil.getEncodeMap()));
 	}
 
+	/**
+	 *  Test for the readFreqWeights method.  
+	 *  This method uses the readInputFileAndReturnWeights method to both generate the
+	 *  weights in GenWeights.java for Harry Potter and get the array of weights. Then 
+	 *  the weights are saved to a temporary file, and the readFreqWeights method is used to 
+	 *  read the weights file and return the results as the readWeights array. Each index of
+	 *  weights[] and readWeights[] are compared for equality; any mismatch is a failure.
+	 *  The temporary weights file is then deleted.
+	 */
+	@Test
+	@Order(12)
+	void test_readFreqWeights() {
+		optimize = false;
+		huffUtil = new HuffmanCompressionUtilities();
+		hca = new HuffCompAlerts(null);
+		gw = new GenWeights(hca);
+		String fname = "Harry Potter and the Sorcerer.txt";
+		File testWeights = new File("weights/readFreqWeights.csv");
+
+		int[] weights = gw.readInputFileAndReturnWeights(dir+fname);
+		gw.saveWeightsToFile(testWeights.getPath());
+		
+		int[] readWeights = huffUtil.readFreqWeights(testWeights);
+		for (int i = 0; i < weights.length; i++) {
+			assertTrue(weights[i] == readWeights[i]);
+		}
+		assertTrue(testWeights.delete());
+	}
+
+	
 }
