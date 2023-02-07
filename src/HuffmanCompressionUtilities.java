@@ -51,6 +51,12 @@ public class HuffmanCompressionUtilities {
 		// Instantiate the Priority Queue with the appropriate static comparator...
 		// Initialize root to null, and all other private variables
 		// including fio.
+		queue = new PriorityQueue<HuffmanTreeNode>(HuffmanTreeNode.compareWeightOrd);
+		weights = new int[NUM_ASCII];
+		encodeMap = new String[NUM_ASCII];
+		root = null;
+		str = "";
+		fio = new MyFileIO();
 	}
 	
 	/**
@@ -59,8 +65,7 @@ public class HuffmanCompressionUtilities {
 	 * @return the tree root
 	 */
 	HuffmanTreeNode getTreeRoot() {
-		//TODO - write this method
-		return null; // remove when written
+		return root;
 	}
 	
 	/**
@@ -69,8 +74,7 @@ public class HuffmanCompressionUtilities {
 	 * @return the encode map
 	 */
 	String[] getEncodeMap() {
-		//TODO - write this method
-		return null; // remove when written
+		return encodeMap;
 	}
 	
 	/**
@@ -83,8 +87,22 @@ public class HuffmanCompressionUtilities {
 	 * @return the int[] that represent the weights....
 	 */
 	int[] readFreqWeights(File inf) {
-		//TODO - write this method
-		return null; // remove this when written
+		BufferedReader bufferedReader = fio.openBufferedReader(inf);
+		String readLine;
+		String[] splitLine;
+		
+		try {
+			while ((readLine = bufferedReader.readLine()) != null) {
+				splitLine = readLine.split("[,]", 0);
+				weights[Integer.parseInt(splitLine[0])] = Integer.parseInt(splitLine[1]);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		fio.closeFile(bufferedReader);
+		return weights;
 	}			
 
 	/**
@@ -97,8 +115,15 @@ public class HuffmanCompressionUtilities {
 	 *                   weights to the queue
 	 */
 	void initializeHuffmanQueue(boolean minimize) {
-		//TODO - write this method
-		
+		for (int i = 0; i < weights.length; i++) {
+			if (!minimize) {
+				queue.add(new HuffmanTreeNode(i, weights[i]));
+			} else {
+				if (weights[i] != 0) {
+					queue.add(new HuffmanTreeNode(i, weights[i]));
+				}
+			}
+		}
 	}
 	
 	/**
@@ -107,8 +132,7 @@ public class HuffmanCompressionUtilities {
 	 * @param weights the new weights
 	 */
 	void setWeights(int[] weights) {
-		//TODO - write this method
-	
+		this.weights = weights;
 	}
 	
 	/**
@@ -132,8 +156,22 @@ public class HuffmanCompressionUtilities {
 	 */
 	void buildHuffmanTree(boolean minimize) {
 		HuffmanTreeNode left, right;
-		//TODO: write this method
 		
+		root = null;
+		encodeMap = new String[NUM_ASCII];
+		initializeHuffmanQueue(minimize);
+		
+		while (queue.peek() != null) {
+			left = queue.remove();
+			
+			if (queue.peek() == null) {
+				root = left;
+				return;
+			}
+			
+			right = queue.remove();
+			queue.add(new HuffmanTreeNode(left.getWeight() + right.getWeight(), left, right));
+		}
 	}
 	
 	/**
@@ -165,7 +203,16 @@ public class HuffmanCompressionUtilities {
 	 * @param level the level of the current node in the hierarchy. This is for debugging only...
 	 */
 	void createHuffmanCodes(HuffmanTreeNode node, String code, int level) {
-		//TODO: write this method
+		if (node == null) {
+			return;
+		}
+		
+		if (node.isLeaf()) {
+			encodeMap[node.getOrdValue()] = code;
+		}
+		
+		createHuffmanCodes(node.getLeft(), code.concat("0"), level + 1);
+		createHuffmanCodes(node.getRight(), code.concat("1"), level + 1);
 	}
 	
 	/**
