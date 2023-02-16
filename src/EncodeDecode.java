@@ -165,6 +165,19 @@ public class EncodeDecode {
 	 * @param optimize - exclude 0-weight nodes from the tree
 	 */
 	void decode(String bfName, String ofName, String freqWts,boolean optimize) {
+		errorCheckFile(bfName);
+		errorCheckFile(ofName);
+		errorCheckFile(freqWts);
+		
+		weights = huffUtil.readFreqWeights(fio.getFileHandle(freqWts));
+		huffUtil.buildHuffmanTree(optimize);
+		huffUtil.createHuffmanCodes(huffUtil.getTreeRoot(), "", 0);
+		try {
+			executeDecode(fio.getFileHandle(bfName), fio.getFileHandle(ofName));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	// DO NOT CODE THIS METHOD UNTIL EXPLICITLY INSTRUCTED TO DO SO!!!
@@ -186,6 +199,26 @@ public class EncodeDecode {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	private void executeDecode(File binFile, File outFile) throws IOException {
+		String binStr = "";
+		int counter;
+		BufferedInputStream bufferedInputStream =  fio.openBufferedInputStream(binFile);
+		BufferedOutputStream bufferedOutputStream = fio.openBufferedOutputStream(outFile);
+		
+		while ((counter = bufferedInputStream.read()) != -1) {
+			binStr += binUtil.convBinToStr(counter);
+			int decodeChar;
+			
+			while ((decodeChar = huffUtil.decodeString(binStr)) != -1) {
+				if (decodeChar == 0) {
+					fio.closeStream(bufferedOutputStream);
+					fio.closeStream(bufferedOutputStream);
+					return;
+				}
+				bufferedOutputStream.write(decodeChar);
+				binStr = binStr.substring(encodeMap[decodeChar].length());
+			}
+		}
+		fio.closeStream(bufferedOutputStream);
+		fio.closeStream(bufferedOutputStream);
 	}
-
 }
