@@ -199,6 +199,7 @@ public class EncodeDecode {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	private void executeDecode(File binFile, File outFile) throws IOException {
+		encodeMap = huffUtil.getEncodeMap();
 		String binStr = "";
 		int counter;
 		BufferedInputStream bufferedInputStream =  fio.openBufferedInputStream(binFile);
